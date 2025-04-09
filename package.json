@@ -1,0 +1,15 @@
+{
+  "name": "bookkeeping-system",
+  "version": "1.0.0",
+  "description": "XLSX Order Processing System",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "install-python-deps": "pip install -r requirements.txt"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^29.1.0"
+  }
+} 

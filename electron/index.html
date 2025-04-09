@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bookkeeping System</title>
+    <style>
+        :root {
+            --aero-blue: #0078D7;
+            --aero-light-blue: #E5F3FF;
+            --aero-gray: #F0F0F0;
+            --aero-border: #D1D1D1;
+            --aero-shadow: rgba(0, 0, 0, 0.1);
+            --pastel-green: #C8E6C9;
+            --pastel-green-light: #E8F5E9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: url('../assets/background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.7) 0%, 
+                rgba(255, 255, 255, 0.7) 100%
+            );
+            z-index: -1;
+            backdrop-filter: blur(1px);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(200, 230, 201, 0.3);
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                rgba(200, 230, 201, 0.15) 100%
+            );
+            border-radius: 6px;
+            pointer-events: none;
+        }
+
+        h1 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        .file-section {
+            margin: 40px 20px;
+            padding: 40px;
+            border: 1px solid rgba(200, 230, 201, 0.4);
+            border-radius: 3px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.98);
+        }
+
+        .file-section p {
+            color: #333333;
+            font-size: 14px;
+        }
+
+        button {
+            background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 0.98) 0%, 
+                rgba(240, 240, 240, 0.98) 100%
+            );
+            color: #2E7D32;
+            padding: 8px 20px;
+            border: 1px solid rgba(200, 230, 201, 0.4);
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-width: 100px;
+            display: inline-block;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: linear-gradient(to bottom, 
+                #FFFFFF 0%, 
+                #F8F8F8 100%
+            );
+            border-color: #2E7D32;
+            color: #1B5E20;
+        }
+
+        button:active {
+            background: linear-gradient(to bottom, 
+                #F0F0F0 0%, 
+                #FFFFFF 100%
+            );
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+        }
+
+        button:disabled {
+            background: #F0F0F0;
+            border-color: #D1D1D1;
+            color: #666666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid var(--aero-border);
+        }
+
+        .success {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+            border-color: #A5D6A7;
+        }
+
+        .error {
+            background-color: #FFEBEE;
+            color: #C62828;
+            border-color: #FFCDD2;
+        }
+
+        #log {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--aero-gray);
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--aero-border);
+        }
+
+        .receipt-section {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid var(--aero-border);
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px var(--aero-shadow);
+        }
+
+        .receipt-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .receipt-card {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 120, 215, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .receipt-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 120, 215, 0.2);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .receipt-content {
+            color: #333333;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            background-color: rgba(240, 240, 240, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--aero-border);
+        }
+
+        .receipt-title {
+            font-weight: 600;
+            color: #2E7D32;
+        }
+
+        .receipt-date {
+            color: #333333;
+            font-size: 0.9em;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(200, 230, 201, 0.4);
+        }
+
+        .tab {
+            color: #2E7D32;
+            font-size: 14px;
+            padding: 12px 24px;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            background: rgba(200, 230, 201, 0.1);
+            color: #1B5E20;
+        }
+
+        .tab.active {
+            color: #1B5E20;
+            border-bottom: 2px solid #2E7D32;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--aero-gray);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--aero-blue);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #005A9E;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bookkeeping System</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('process')">Process File</button>
+            <button class="tab" onclick="showTab('receipts')">View Receipts</button>
+        </div>
+
+        <div id="process-tab" class="tab-content active">
+            <div class="file-section">
+                <button id="selectFile">Select XLSX File</button>
+                <button id="processFile" disabled>Process File</button>
+                <p id="selectedFile">No file selected</p>
+                <div id="status"></div>
+                <div id="log"></div>
+            </div>
+        </div>
+
+        <div id="receipts-tab" class="tab-content">
+            <div class="receipt-section">
+                <h2>Generated Receipts</h2>
+                <div id="receiptsList" class="receipt-list">
+                    <!-- Receipts will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        let selectedFilePath = null;
+        const selectFileBtn = document.getElementById('selectFile');
+        const processFileBtn = document.getElementById('processFile');
+        const selectedFileText = document.getElementById('selectedFile');
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+        const receiptsList = document.getElementById('receiptsList');
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function displayReceipts(receipts) {
+            receiptsList.innerHTML = '';
+            receipts.forEach(receipt => {
+                const card = document.createElement('div');
+                card.className = 'receipt-card';
+                
+                const header = document.createElement('div');
+                header.className = 'receipt-header';
+                
+                const title = document.createElement('div');
+                title.className = 'receipt-title';
+                title.textContent = receipt.name;
+                
+                const date = document.createElement('div');
+                date.className = 'receipt-date';
+                date.textContent = receipt.date;
+                
+                header.appendChild(title);
+                header.appendChild(date);
+                
+                const content = document.createElement('div');
+                content.className = 'receipt-content';
+                // Replace $ with ₱ in the receipt content
+                content.textContent = receipt.content.replace(/\$/g, '₱');
+                
+                card.appendChild(header);
+                card.appendChild(content);
+                receiptsList.appendChild(card);
+            });
+        }
+
+        selectFileBtn.addEventListener('click', async () => {
+            try {
+                const filePath = await ipcRenderer.invoke('select-file');
+                if (filePath) {
+                    selectedFilePath = filePath;
+                    selectedFileText.textContent = `Selected file: ${filePath}`;
+                    processFileBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error selecting file:', error);
+            }
+        });
+
+        processFileBtn.addEventListener('click', async () => {
+            if (!selectedFilePath) return;
+
+            statusDiv.className = '';
+            statusDiv.textContent = 'Processing...';
+            logDiv.textContent = '';
+            processFileBtn.disabled = true;
+
+            try {
+                const result = await ipcRenderer.invoke('process-file', selectedFilePath);
+                statusDiv.className = 'success';
+                statusDiv.textContent = 'Processing completed successfully!';
+                
+                // Show receipts tab after processing
+                showTab('receipts');
+            } catch (error) {
+                statusDiv.className = 'error';
+                statusDiv.textContent = 'Error processing file. Check the log for details.';
+                console.error('Error processing file:', error);
+            } finally {
+                processFileBtn.disabled = false;
+            }
+        });
+
+        // Listen for processing status updates
+        ipcRenderer.on('processing-status', (event, message) => {
+            logDiv.textContent += message;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        });
+
+        // Listen for processing errors
+        ipcRenderer.on('processing-error', (event, message) => {
+            logDiv.textContent += `Error: ${message}`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        });
+
+        // Listen for receipt updates
+        ipcRenderer.on('receipt-update', (event, receipts) => {
+            displayReceipts(receipts);
+        });
+    </script>
+</body>
+</html> 
